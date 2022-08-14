@@ -2,7 +2,7 @@ import networkx as nx
 import itertools as it
 
 
-def communities_brute(G):
+def find_communities_brute_force(G):
     nodes = G.nodes()
     n = G.order()
     e = G.size()
@@ -15,8 +15,7 @@ def communities_brute(G):
         comb2 = []
 
         for x in it.combinations(nodes, i):
-            listX = list(x)
-            comb1.append(listX)
+            comb1.append(list(x))
             comb2.append(list(set(nodes) - set(x)))
 
         first_community.extend(comb1)
@@ -45,4 +44,4 @@ def communities_brute(G):
 
 
 Gr = nx.barbell_graph(3, 0)
-communities_brute(Gr)
+find_communities_brute_force(Gr)
