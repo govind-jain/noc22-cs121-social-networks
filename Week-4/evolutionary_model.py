@@ -18,13 +18,16 @@ def visualize_graph(G):
     plt.show()
 
 
-def visualize_graph_size(G, nsize):
-    nx.draw(G, node_size=nsize)
+def visualize_graph_size(G):
+    node_size = get_node_size(G)
+    nx.draw(G, node_size=node_size)
     plt.show()
 
 
-def visualize_graph_size_color(G, nsize, ncolor):
-    nx.draw(G, node_size=nsize, node_color=ncolor)
+def visualize_graph_size_color(G):
+    node_size = get_node_size(G)
+    node_colors = get_node_colors(G)
+    nx.draw(G, node_size=node_size, node_color=node_colors)
     plt.show()
 
 
@@ -168,20 +171,34 @@ def closure(G):
     return G
 
 
+def social_influence(G):
+    foci_nodes = get_foci_elements(G)
+
+    for each in foci_nodes:
+        if G._node[each]['name'] == 'gym':
+            for neighbor in G.neighbors(each):
+                temp = G._node[neighbor]['name']
+                if temp > 15:
+                    G._node[neighbor]['name'] = temp - 1
+        elif G._node[each]['name'] == 'canteen':
+            for neighbor in G.neighbors(each):
+                temp = G._node[neighbor]['name']
+                if temp < 40:
+                    G._node[neighbor]['name'] = temp + 1
+
+    return G
+
+
 G = create_graph(100)
 
 assign_bmi(G)
 assign_foci(G)
 
-label_dict = get_label_dict(G)
-node_size = get_node_size(G)
-node_colors = get_node_colors(G)
-
 add_edges_to_foci(G)
-visualize_graph_size_color(G, node_size, node_colors)
+visualize_graph_size_color(G)
 
-homphily(G)
-visualize_graph_size_color(G, node_size, node_colors)
-
-closure(G)
-visualize_graph_size_color(G, node_size, node_colors)
+for loop in range(5):
+    homphily(G)
+    closure(G)
+    social_influence(G)
+    visualize_graph_size_color(G)
