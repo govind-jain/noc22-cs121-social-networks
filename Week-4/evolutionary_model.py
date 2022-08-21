@@ -70,10 +70,23 @@ def get_node_colors(G):
     node_colors = []
 
     for el in G.nodes():
-        if G._node[el]['type'] == 'person':
-            node_colors.append('Green')
+        node = G._node[el]
+
+        if node['type'] == 'person':
+            value = node['name']
+
+            if value < 18:
+                node_colors.append('#00C0F0')
+            elif value < 25:
+                node_colors.append('Lime')
+            elif value < 30:
+                node_colors.append('Yellow')
+            elif value < 35:
+                node_colors.append('Orange')
+            else:
+                node_colors.append('Red')
         else:
-            node_colors.append('Red')
+            node_colors.append('#B77729')
 
     return node_colors
 
@@ -88,12 +101,37 @@ def get_foci_elements(G):
     return foci_elements
 
 
+def get_person_elements(G):
+    person_elements = []
+
+    for el in G.nodes():
+        if G._node[el]['type'] == 'person':
+            person_elements.append(el)
+
+    return person_elements
+
+
 def add_edges_to_foci(G):
     foci_elements = get_foci_elements(G)
 
     for el in G.nodes():
         if G._node[el]['type'] == 'person':
             G.add_edge(el, rn.choice(foci_elements))
+
+    return G
+
+
+def homphily(G):
+    person_elements = get_person_elements(G)
+    n = len(person_elements)
+
+    for i in range(n):
+        for j in range(i+1, n):
+            diff = abs(G._node[person_elements[i]]['name'] - G._node[person_elements[j]]['name'])
+            prob = float(1)/(1000 + diff)
+
+            if rn.uniform(0, 1) < prob:
+                G.add_edge(i, j)
 
     return G
 
@@ -107,6 +145,8 @@ label_dict = get_label_dict(G)
 node_size = get_node_size(G)
 node_colors = get_node_colors(G)
 
-G = add_edges_to_foci(G)
+add_edges_to_foci(G)
+visualize_graph_size_color(G, node_size, node_colors)
 
+homphily(G)
 visualize_graph_size_color(G, node_size, node_colors)
