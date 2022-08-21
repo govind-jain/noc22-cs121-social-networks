@@ -1,12 +1,13 @@
 import networkx as nx
 import matplotlib.pyplot as plt
 import random as rn
+import math
 
 
 def create_graph(n):
     G = nx.Graph()
 
-    for i in range(1, n+1):
+    for i in range(1, n + 1):
         G.add_node(i)
 
     return G
@@ -34,7 +35,6 @@ def assign_bmi(G):
 
 
 def assign_foci(G):
-
     n = G.order()
     foci_elements = ['gym', 'canteen', 'table_tennis', 'dance_club', 'nso', 'ncc']
 
@@ -111,6 +111,13 @@ def get_person_elements(G):
     return person_elements
 
 
+def get_common_neighbors(G, u, v):
+    neighbors_u = set(G.neighbors(u))
+    neighbors_v = set(G.neighbors(v))
+
+    return len(neighbors_u & neighbors_v)
+
+
 def add_edges_to_foci(G):
     foci_elements = get_foci_elements(G)
 
@@ -126,12 +133,37 @@ def homphily(G):
     n = len(person_elements)
 
     for i in range(n):
-        for j in range(i+1, n):
+        for j in range(i + 1, n):
             diff = abs(G._node[person_elements[i]]['name'] - G._node[person_elements[j]]['name'])
-            prob = float(1)/(1000 + diff)
+            prob = float(1) / (1000 + diff)
 
             if rn.uniform(0, 1) < prob:
                 G.add_edge(i, j)
+
+    return G
+
+
+def closure(G):
+    pairs = []
+    n = G.order()
+    nodes = G.nodes()
+
+    for i in range(1, n+1):
+        for j in range(i+1, n+1):
+            if G.has_edge(i, j) == 0 and (nodes[i]['type'] == 'person' or nodes[j]['type'] == 'person'):
+                common_neighbors = get_common_neighbors(G, i, j)
+                p_for_each_common_node = 0.01
+                p_for_becoming_friends = 1 - math.pow(1 - p_for_each_common_node, common_neighbors)
+
+                temp = []
+                temp.append(i)
+                temp.append(j)
+                temp.append(p_for_becoming_friends)
+                pairs.append(temp)
+
+    for pair in pairs:
+        if rn.uniform(0, 1) < pair[2]:
+            G.add_edge(pair[0], pair[1])
 
     return G
 
@@ -149,4 +181,7 @@ add_edges_to_foci(G)
 visualize_graph_size_color(G, node_size, node_colors)
 
 homphily(G)
+visualize_graph_size_color(G, node_size, node_colors)
+
+closure(G)
 visualize_graph_size_color(G, node_size, node_colors)
