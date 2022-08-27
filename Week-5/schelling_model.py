@@ -55,22 +55,78 @@ def connect_diagonals_2D_graph(G, N):
 
 
 def assign_type(G):
-    empty_cells_list = []
-    type1_node_list = []
-    type2_node_list = []
 
     for cell in G.nodes():
         cell_type = rn.randint(0, 2)
         G._node[cell]['type'] = cell_type
 
-        if cell_type == 0:
-            empty_cells_list.append(cell)
-        elif cell_type == 1:
-            type1_node_list.append(cell)
-        else:
-            type2_node_list.append(cell)
+    return G
 
-    return G, empty_cells_list, type1_node_list, type2_node_list
+
+def is_unsatisfied(G, element):
+    threshold = 3
+    neighbors = list(G.neighbors(element))
+
+    if len(neighbors) < threshold:
+        return True
+
+    node_type = G._node[element]['type']
+    similar = 0
+
+    for neighbor in neighbors:
+        if node_type == G._node[neighbor]['type']:
+            similar += 1
+
+    return similar < threshold
+
+
+def shift_unsatisfied_node(G, labels_dict, unsatisfied_node, empty_cell):
+    G._node[empty_cell]['type'] = G._node[unsatisfied_node]['type']
+    G._node[unsatisfied_node]['type'] = 0
+    labels_dict[unsatisfied_node], labels_dict[empty_cell] = labels_dict[empty_cell], labels_dict[unsatisfied_node]
+
+    return G, labels_dict
+
+
+def rearrange_a_unsatisfied_node(G, labels_dict):
+    unsatisfied_nodes = []
+    empty_cells = []
+
+    for element in G.nodes():
+        node_type = G._node[element]['type']
+
+        if node_type == 0:
+            empty_cells.append(element)
+        elif is_unsatisfied(G, element):
+            unsatisfied_nodes.append(element)
+
+    if len(empty_cells) == 0:
+        return G, labels_dict, 0
+    elif len(unsatisfied_nodes) == 0:
+        return G, labels_dict, 2
+
+    G, labels_dict = shift_unsatisfied_node(G, labels_dict, rn.choice(unsatisfied_nodes), rn.choice(empty_cells))
+
+    return G, labels_dict, 1
+
+
+def rearrange_unsatisfied_nodes(G, labels_dict):
+
+    steps_taken = 0
+
+    while steps_taken <= 1000:
+        G, labels_dict, this_step = rearrange_a_unsatisfied_node(G, labels_dict)
+
+        if this_step == 0:
+            print("No empty cells left")
+            return G, labels_dict, 100000
+        elif this_step == 1:
+            steps_taken += 1
+        else:
+            print("All nodes are satisfied")
+            break
+
+    return G, labels_dict, steps_taken
 
 
 N = 10
@@ -78,8 +134,12 @@ N = 10
 G, pos_dict, labels_dict = get_2D_graph(N)
 # plot_2D_graph(G, pos_dict, labels_dict)
 
-connect_diagonals_2D_graph(G, N)
+G = connect_diagonals_2D_graph(G, N)
 # plot_2D_graph(G, pos_dict, labels_dict)
 
-assign_type(G)
+G = assign_type(G)
 plot_2D_graph_colors(G, pos_dict, labels_dict)
+
+G, labels_dict, steps_taken = rearrange_unsatisfied_nodes(G, labels_dict)
+plot_2D_graph_colors(G, pos_dict, labels_dict)
+print(steps_taken, "steps are taken.")
