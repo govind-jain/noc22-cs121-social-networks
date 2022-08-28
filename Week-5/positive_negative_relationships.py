@@ -1,6 +1,9 @@
 import networkx as nx
 import matplotlib.pyplot as plt
 import random as rn
+import itertools
+
+
 def create_graph(N):
     G = nx.Graph()
 
@@ -34,6 +37,33 @@ def display_friendships(G):
     nx.draw(G, pos, with_labels=True, node_size=5000)
     nx.draw_networkx_edge_labels(G, pos, edge_labels=relationships, font_size=20, font_color='red')
     plt.show()
+
+
+def get_list_of_all_triangles(G):
+    nodes = G.nodes()
+    all_triangles = [list(x) for x in itertools.combinations(nodes, 3)]
+    return all_triangles
+
+
+def get_list_of_all_unstable_triangles(G, all_triangles):
+    unstable_triangles = []
+
+    for triangle in all_triangles:
+        minus = 0
+
+        if G[triangle[0]][triangle[1]]['sign'] == '-':
+            minus += 1
+
+        if G[triangle[1]][triangle[2]]['sign'] == '-':
+            minus += 1
+
+        if G[triangle[2]][triangle[0]]['sign'] == '-':
+            minus += 1
+
+        if minus == 1 or minus == 3:
+            unstable_triangles.append(triangle)
+
+    return unstable_triangles
 
 
 G = create_graph(6)
