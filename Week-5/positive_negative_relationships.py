@@ -66,6 +66,37 @@ def get_list_of_all_unstable_triangles(G, all_triangles):
     return unstable_triangles
 
 
+def stabilize_one_triangle(G, unstable_triangles):
+    triangle_to_be_stabilized = rn.choice(unstable_triangles)
+
+    relation_to_be_flipped = rn.randint(0, 2)
+
+    node1 = triangle_to_be_stabilized[relation_to_be_flipped]
+    node2 = triangle_to_be_stabilized[(relation_to_be_flipped + 1) % 3]
+
+    if G[node1][node2]['sign'] == '+':
+        G[node1][node2]['sign'] = '-'
+    else:
+        G[node1][node2]['sign'] = '+'
+
+    return G
+
+
+def stabilize_all_triangles(G):
+    all_triangles = get_list_of_all_triangles(G)
+
+    unstable_triangles = get_list_of_all_unstable_triangles(G, all_triangles)
+
+    while len(unstable_triangles) != 0:
+        G = stabilize_one_triangle(G, unstable_triangles)
+        unstable_triangles = get_list_of_all_unstable_triangles(G, all_triangles)
+
+    return G
+
+
 G = create_graph(6)
 G = add_friendship_edges(G)
+display_friendships(G)
+
+G = stabilize_all_triangles(G)
 display_friendships(G)
