@@ -7,7 +7,7 @@ def create_directed_graph_with_probability(n, p):
 
     G = nx.DiGraph()
 
-    for i in range(1, n+1):
+    for i in range(n):
         G.add_node(i)
 
     nodes = G.nodes()
@@ -18,3 +18,72 @@ def create_directed_graph_with_probability(n, p):
                 G.add_edge(u, v)
     
     return G
+
+
+def initialize_points(G, point):
+    points = []
+
+    for i in range(G.order()):
+        points.append(point)
+
+    return points
+
+
+def point_distribution_iteration(G, prev_points):
+    new_points = [0 for i in range(G.order())]
+
+    for node in G.nodes():
+        out_edges = G.out_edges(node)
+
+        if(len(out_edges) == 0):
+            new_points[node] += prev_points[node]
+        else:
+            share = (float)(prev_points[node])/len(out_edges)
+
+            for out_edge in out_edges:
+                new_points[out_edge[1]] += share
+
+    return new_points
+
+
+def reached_equilibrium(prev_points, new_points):
+
+    n = len(prev_points)
+
+    for i in range(n):
+        change = abs(prev_points[i] - new_points[i])
+
+        if prev_points[i] == 0:
+            continue
+
+        change_fraction = ((float)(change)/prev_points[i]) * 100
+
+        if(change_fraction > 1):
+            return False
+
+    return True
+
+
+def point_distribution(G, points):
+
+    prev_points = points
+
+    while(1):
+        new_points = point_distribution_iteration(G, prev_points)
+
+        if(reached_equilibrium(prev_points, new_points)):
+            break
+
+        prev_points = new_points
+    
+    return new_points
+
+
+def main():
+    G = create_directed_graph_with_probability(10, 0.3)
+    points = initialize_points(G, 100)
+    
+    points = point_distribution(G, points)
+
+
+main()
