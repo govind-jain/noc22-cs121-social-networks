@@ -64,12 +64,24 @@ def reached_equilibrium(prev_points, new_points):
     return True
 
 
-def point_distribution(G, points):
+def handle_points_sink(points, point, f):
+
+    r = 1-f
+
+    for i in range(len(points)):
+        points[i] = f*points[i] + r*point
+
+    return points
+
+
+def point_distribution(G, points, point, f):
 
     prev_points = points
 
     while(1):
         new_points = point_distribution_iteration(G, prev_points)
+
+        new_points = handle_points_sink(new_points, point, f)
 
         if(reached_equilibrium(prev_points, new_points)):
             break
