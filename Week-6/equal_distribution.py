@@ -1,5 +1,7 @@
+from audioop import reverse
 import networkx as nx
 import random as rn
+import numpy as np
 
 
 # We cannot run loop n^2/2 because the graph is directed
@@ -91,11 +93,26 @@ def point_distribution(G, points, point, f):
     return new_points
 
 
+def get_nodes_sorted_by_points(points):
+    points_array = np.array(points)
+    points_sorted_list = np.argsort(-points_array)
+    return points_sorted_list
+
+
 def main():
     G = create_directed_graph_with_probability(10, 0.3)
     points = initialize_points(G, 100)
+
+    points = point_distribution(G, points, 100, 0.8)
+
+    points_sorted_list = get_nodes_sorted_by_points(points)
+    print(points_sorted_list)
+
+    page_rank = nx.pagerank(G)
+    page_rank_sorted = sorted(page_rank.items(), key = lambda x:x[1], reverse=1)
     
-    points = point_distribution(G, points)
+    for el in page_rank_sorted:
+        print(el[0])
 
 
 main()
