@@ -113,5 +113,40 @@ def main():
 
     nodes = G.nodes()
 
+    for u in nodes:
+        for v in nodes:
+            if u < v:
+
+                listB = [u, v]
+                G = set_selected_B(G, listB)
+
+                # print_graph(G)
+
+                count = 0
+                flag = False
+
+                while(1):
+
+                    if count >= 100:
+                        break
+
+                    flag = all_nodes_same_action(G)
+
+                    if flag != 'C':
+                        break
+
+                    G = recalculate_options(G)
+                    # print_graph(G)
+
+                    count += 1
+
+                if flag == 'B':
+                    print("Cascade is completed successfully : (", u, ", ", v, ")")
+                    print_graph(G)
+                elif flag == 'A':
+                    print("Cascade is failed")
+                else:
+                    print("Cascaded is partially completed")
+
 
 main()
