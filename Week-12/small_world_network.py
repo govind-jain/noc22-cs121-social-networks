@@ -44,3 +44,34 @@ def add_edges_homophily(G, nodes, farthestNeighborDistance):
             G.add_edge(nodes[idx], nodes[(idx-offset+n)%n])
 
     return G
+
+
+def find_best_neighbor(G, H, current, dest):
+
+    min_dist = G.number_of_nodes()
+    best_neighbor = current
+
+    for each in G.neighbors(current):
+        
+        this_dist = nx.shortest_path_length(H, source=each, target=dest)
+
+        if this_dist < min_dist:
+            min_dist = this_dist
+            best_neighbor = each
+            
+    return best_neighbor        
+
+
+def get_myopic_path(G, H, src, dest):
+
+    path = []
+
+    current = src
+    path.append(current)
+
+    while current != dest:
+        best_neighbor = find_best_neighbor(G, H, current, dest)
+        path.append(best_neighbor)
+        current = best_neighbor
+
+    return path
