@@ -229,3 +229,31 @@ def plot_average_myopic_distance_vs_graph_size(minGraphSize, maxGraphSize, incre
     plt.ylabel('Average myopic distance b/w diametrically opposite nodes')
     plt.plot(x_axis, y_axis)
     plt.show()
+
+
+def main():
+
+    n = 100
+    farthestNeighborDistance = 2
+    number_of_rewirings_to_be_done = (int)(n/10)
+
+    G = nx.Graph()
+    G.add_nodes_from(range(0, n))
+    nodeList = list(G.nodes())
+
+    G = add_edges_homophily(G, nodeList, farthestNeighborDistance)
+    H = G.copy()
+    G = add_weak_ties(G, nodeList, number_of_rewirings_to_be_done)
+    
+    plot_diameter_vs_number_of_rewired_edges(H, number_of_rewirings_to_be_done)
+
+    src = rn.choice(range(0, (int)(n/2)))
+    dest = src + (int)(n/2)
+    plot_myopic_and_optimal_paths(G, H, src, dest)
+
+    compare_myopic_and_optimal_paths(G, H)
+
+    plot_average_myopic_distance_vs_graph_size(100, 1000, 100)
+
+
+main()
