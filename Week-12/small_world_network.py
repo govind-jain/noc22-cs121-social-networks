@@ -178,3 +178,36 @@ def plot_diameter_vs_number_of_rewired_edges(H, number_of_rewirings_to_be_done):
     plt.ylabel('Diameter')
     plt.plot(x_axis, y_axis)
     plt.show()
+
+
+def average_myopic_path_length_between_diametrically_opposite_nodes(graphSize, number_of_rewirings_to_be_done):
+
+    # Create graph of desired size
+    G = nx.Graph()
+    G.add_nodes_from(range(0, graphSize))
+    nodeList = list(G.nodes())
+
+    # Add nodes between adjacent nodes
+    G = add_edges_homophily(G, nodeList, 1)
+    H = G.copy()
+
+    # Add weak ties
+    G = add_weak_ties(G, nodeList, number_of_rewirings_to_be_done)
+
+    # Calculate myopic path len for diameterically opposite nodes
+    total_myopic_path_len = 0
+    max_diameter_possible = (int)(graphSize/2)
+    diametrically_opposite_pairs = (int)(graphSize/2)
+
+    # For each node there exist two nodes at distance max_diameter_possible
+    if graphSize%2 == 1:
+        diametrically_opposite_pairs *= 2
+
+    for src in range(0, diametrically_opposite_pairs + 1):
+
+        dest = (src + max_diameter_possible)%graphSize
+        myopic_path_len = len(get_myopic_path(G, H, src, dest))
+        total_myopic_path_len += myopic_path_len
+
+    # Return the average of myopic_path_len for all possible pairs
+    return total_myopic_path_len/diametrically_opposite_pairs
