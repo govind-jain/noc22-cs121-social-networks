@@ -147,3 +147,34 @@ def compare_myopic_and_optimal_paths(G, H):
     plt.plot(x_axis, myopic_path_len, 'r')
     plt.plot(x_axis, optimal_path_len, 'b')
     plt.show()
+
+
+def plot_diameter_vs_number_of_rewired_edges(H, number_of_rewirings_to_be_done):
+
+    duplicateGraph = H.copy()
+    nodeList = list(duplicateGraph.nodes())
+
+    n = len(nodeList)
+
+    if(number_of_rewirings_to_be_done > (int)((n*(n-1))/2)):
+        print('Number of rewirings requested is greater than the possible number of edges.')
+        return
+
+    x_axis = []
+    y_axis = []
+    t = 0
+
+    x_axis.append(t)
+    y_axis.append(nx.diameter(duplicateGraph))
+
+    while t < number_of_rewirings_to_be_done:
+        t += 1
+        duplicateGraph = add_weak_tie(duplicateGraph, nodeList)
+
+        x_axis.append(t)
+        y_axis.append(nx.diameter(duplicateGraph))
+
+    plt.xlabel('Number of weak ties added')
+    plt.ylabel('Diameter')
+    plt.plot(x_axis, y_axis)
+    plt.show()
