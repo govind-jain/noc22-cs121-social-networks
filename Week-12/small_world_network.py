@@ -113,3 +113,37 @@ def plot_myopic_and_optimal_paths(G, H, src, dest):
 
     nx.draw(G, node_color=colors)
     plt.show()
+
+
+def compare_myopic_and_optimal_paths(G, H):
+
+    n = G.number_of_nodes()
+
+    max_diameter_possible = (int)(n/2)
+    diametrically_opposite_pairs = (int)(n/2)
+
+    # For each node there exist two nodes at distance max_diameter_possible
+    if n%2 == 1:
+        diametrically_opposite_pairs *= 2
+
+    x_axis = []
+    myopic_path_len = []
+    optimal_path_len = []
+    time = 0
+
+    for src in range(0, diametrically_opposite_pairs + 1):
+
+        dest = (src + max_diameter_possible)%n
+
+        myopic_path = get_myopic_path(G, H, src, dest)
+        optimal_path = nx.shortest_path(G, source=src, target=dest)
+
+        x_axis.append(time)
+        time += 1
+
+        myopic_path_len.append(len(myopic_path))
+        optimal_path_len.append(len(optimal_path))
+
+    plt.plot(x_axis, myopic_path_len, 'r')
+    plt.plot(x_axis, optimal_path_len, 'b')
+    plt.show()
