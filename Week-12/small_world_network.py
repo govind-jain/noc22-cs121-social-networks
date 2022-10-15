@@ -211,3 +211,21 @@ def average_myopic_path_length_between_diametrically_opposite_nodes(graphSize, n
 
     # Return the average of myopic_path_len for all possible pairs
     return total_myopic_path_len/diametrically_opposite_pairs
+
+
+def plot_average_myopic_distance_vs_graph_size(minGraphSize, maxGraphSize, increamentFactor):
+
+    x_axis = []
+    y_axis = []
+
+    for graphSize in range(minGraphSize, maxGraphSize+1, increamentFactor):
+
+        x_axis.append(graphSize)
+
+        number_of_rewirings_to_be_done = (int)(graphSize/10)
+        y_axis.append(average_myopic_path_length_between_diametrically_opposite_nodes(graphSize, number_of_rewirings_to_be_done))
+
+    plt.xlabel('Graph size')
+    plt.ylabel('Average myopic distance b/w diametrically opposite nodes')
+    plt.plot(x_axis, y_axis)
+    plt.show()
