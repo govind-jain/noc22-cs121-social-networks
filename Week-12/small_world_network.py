@@ -75,3 +75,41 @@ def get_myopic_path(G, H, src, dest):
         current = best_neighbor
 
     return path
+
+
+def set_path_colors(G, myopic_path, optimal_path, src, dest):
+
+    colors = []
+    nodes = G.nodes()
+
+    myopic_path_set = set(myopic_path)
+    optimal_path_set = set(optimal_path)
+
+    for node in nodes:
+
+        if node == src or node == dest:
+            colors.append('red')
+        elif (node in myopic_path_set) and (node in optimal_path_set):
+            colors.append('#7b2f0e') # Copper shade
+        elif node in myopic_path_set:
+            colors.append('blue')
+        elif node in optimal_path_set:
+            colors.append('green')
+        else:
+            colors.append('black')
+
+    return colors
+
+
+def plot_myopic_and_optimal_paths(G, H, src, dest):
+
+    myopic_path = get_myopic_path(G, H, src, dest)
+    optimal_path = nx.shortest_path(G, source=src, target=dest)
+
+    colors = set_path_colors(G, myopic_path, optimal_path, src, dest)
+    
+    print('Myopic path:', myopic_path)
+    print('Optimal path:', optimal_path)
+
+    nx.draw(G, node_color=colors)
+    plt.show()
